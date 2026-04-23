@@ -1,0 +1,40 @@
+# Block elements and shade patterns.
+# Full block spans all 8 columns on every row (scanline gaps still show
+# horizontally, matching the rest of the font's aesthetic). Shades use
+# stipple patterns the CRT rendered as dotted fills.
+
+U+2588 block
+########
+########
+########
+########
+########
+########
+########
+
+U+2591 lightshade
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+
+U+2592 mediumshade
+#.#.#.#.
+########
+#.#.#.#.
+########
+#.#.#.#.
+########
+#.#.#.#.
+
+U+2593 darkshade
+.#######
+########
+#######.
+########
+.#######
+########
+#######.
