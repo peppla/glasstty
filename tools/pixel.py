@@ -108,14 +108,33 @@ def draw_rounded_rect(pen, x1: int, y1: int, x2: int, y2: int, r: int = CORNER_R
     pen.closePath()
 
 
-def draw_pixel_run(pen, row: int, col_start: int, col_end_inclusive: int, mode: Mode = REGULAR):
-    """Draw a horizontal run of on-pixels at the given design row."""
+def draw_pixel_run(pen, row: int, col_start: int, col_end_inclusive: int, mode: Mode = REGULAR, tile_right: bool = False):
+    """Draw a horizontal run of on-pixels at the given design row.
+
+    `tile_right` forces the right edge to `ADVANCE` instead of honoring the
+    mode's normal extensions — used by box-drawing glyphs whose rightmost
+    pixel must butt up against the next cell to tile seamlessly.
+    """
     shift = _row_shift(row, mode)
     x1 = cell_x(col_start) + shift
-    x2 = cell_x(col_end_inclusive + 1 + mode.extend_right_cols) + mode.extend_right_units + shift
+    if tile_right:
+        x2 = ADVANCE + shift
+    else:
+        x2 = cell_x(col_end_inclusive + 1 + mode.extend_right_cols) + mode.extend_right_units + shift
     y_top = cell_y(row) + PIXEL_H
     y_bot = cell_y(row) - mode.extend_down_units
     draw_rounded_rect(pen, x1, y_bot, x2, y_top)
+
+
+def draw_filled_rect(pen, x1: int, y1: int, x2: int, y2: int):
+    """Draw a plain (non-rounded) rectangle. Used for solid fills like U+2588
+    where the VT220 scanline aesthetic is suppressed and the glyph must fill
+    its entire line box to tile with neighbors."""
+    pen.moveTo((x1, y1))
+    pen.lineTo((x2, y1))
+    pen.lineTo((x2, y2))
+    pen.lineTo((x1, y2))
+    pen.closePath()
 
 
 def draw_raw_run(pen, x1: int, y1: int, x2: int, y2: int, mode: Mode = REGULAR):

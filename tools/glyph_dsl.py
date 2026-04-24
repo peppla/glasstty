@@ -48,7 +48,12 @@ class Glyph:
         """Fetch by design row (0=baseline, 6=cap-top)."""
         return self.rows[GRID_H - 1 - design_row]
 
-    def draw(self, pen, mode: Mode = REGULAR) -> None:
+    def draw(self, pen, mode: Mode = REGULAR, tile_right: bool = False) -> None:
+        """Render the glyph to `pen` under `mode`.
+
+        `tile_right` extends any run that reaches the final column to the
+        full advance width — used for box-drawing glyphs so that adjacent
+        horizontal cells form a continuous line."""
         for design_row in range(GRID_H):
             row = self.grid_row(design_row)
             col = 0
@@ -59,7 +64,8 @@ class Glyph:
                 start = col
                 while col < GRID_W and row[col]:
                     col += 1
-                draw_pixel_run(pen, design_row, start, col - 1, mode)
+                run_tiles = tile_right and col == GRID_W
+                draw_pixel_run(pen, design_row, start, col - 1, mode, tile_right=run_tiles)
 
 
 def _parse_row(line: str) -> tuple[bool, ...]:

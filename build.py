@@ -18,6 +18,7 @@ from __future__ import annotations
 import sys
 
 from tools.build_font import build_all
+from tools.preview import main as build_preview
 from tools.verify import verify
 
 
@@ -26,6 +27,8 @@ def main() -> int:
     for out in outputs:
         verify(out)
         print(f"wrote {out}", file=sys.stderr)
+    preview = build_preview()
+    print(f"wrote {preview}", file=sys.stderr)
     return 0
 
 

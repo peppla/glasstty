@@ -28,12 +28,39 @@ from .outline import Bitmap, dot_stretch, extract_bitmap, runs_in
 from .pixel import (
     ADVANCE,
     BOLD,
+    CELL_W,
     OBLIQUE,
     REGULAR,
     SEMIBOLD,
     Mode,
+    draw_filled_rect,
+    draw_pixel_run,
     draw_raw_run,
 )
+
+# Box-drawing glyphs with a right-going horizontal stroke. Any run that
+# reaches the rightmost DSL column is extended to full advance width so
+# adjacent cells join into a single continuous line.
+TILE_HORIZONTAL = {
+    0x2500, 0x250C, 0x2514, 0x251C, 0x252C, 0x2534, 0x253C,
+}
+# Full block fills the entire line box horizontally AND vertically,
+# suppressing the scanline gap so solid shaded areas actually look solid.
+TILE_FULL = {0x2588}
+
+# Shade patterns render programmatically across a 10-column span (x=0..ADVANCE)
+# instead of through the 8-col DSL, so the pattern continues seamlessly across
+# adjacent cells — no vertical "gutter" between glyphs. Three patterns are
+# chosen to give clearly distinct densities once the scanline gap is factored
+# in: ~14%, ~25%, ~40% of the line-box area, respectively.
+SHADE_COLS = ADVANCE // CELL_W  # 10
+SHADE_ROWS = 7
+
+SHADE_PATTERNS = {
+    0x2591: lambda r, c: (r % 2 == 0) and (c % 2 == 0),   # light: dot grid
+    0x2592: lambda r, c: (r + c) % 2 == 0,                # medium: diagonal checker
+    0x2593: lambda r, c: (r % 2 == 0) or (c % 2 == 0),    # dark: bars + dots
+}
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_TTF = ROOT / "Glass_TTY_VT220.ttf"
@@ -44,7 +71,7 @@ FAMILY_MODERN = "Glass TTY VT220 Modern"
 FAMILY_OBLIQUE = "Glass TTY VT220 Oblique"
 
 VERSION_MAJOR = 2
-VERSION_MINOR = 1
+VERSION_MINOR = 3
 VERSION = f"Version {VERSION_MAJOR:03d}.{VERSION_MINOR:03d}"
 VERSION_TAG = f"{VERSION_MAJOR}.{VERSION_MINOR:03d}"
 VERSION_REVISION = VERSION_MAJOR + VERSION_MINOR / 1000.0
@@ -192,7 +219,31 @@ def _ensure_unique_glyph_name(base: str, existing: set[str]) -> str:
 
 def _render_dsl_glyph(font: TTFont, dsl_glyph: DslGlyph, mode: Mode) -> GlyfGlyph:
     pen = TTGlyphPen(font.getGlyphSet())
-    dsl_glyph.draw(pen, mode)
+    cp = dsl_glyph.codepoint
+    if cp in TILE_FULL:
+        # Solid fill from descender to ascender, full advance width. The
+        # affine-shear pass (if the variant uses it) will skew this rectangle
+        # uniformly, preserving tile continuity between adjacent cells.
+        draw_filled_rect(pen, 0, -150, ADVANCE, 800)
+    elif cp in SHADE_PATTERNS:
+        # Ignore the DSL body entirely — render the pattern programmatically
+        # across 10 columns so the shade tiles with its neighbors. Mode is
+        # forced to REGULAR because shade patterns are raster fills, not
+        # typeface strokes — weight extensions would smear them into block.
+        pattern = SHADE_PATTERNS[cp]
+        for r in range(SHADE_ROWS):
+            c = 0
+            while c < SHADE_COLS:
+                if not pattern(r, c):
+                    c += 1
+                    continue
+                start = c
+                while c < SHADE_COLS and pattern(r, c):
+                    c += 1
+                draw_pixel_run(pen, r, start, c - 1, REGULAR)
+    else:
+        tile_right = cp in TILE_HORIZONTAL
+        dsl_glyph.draw(pen, mode, tile_right=tile_right)
     return pen.glyph()
 
 
