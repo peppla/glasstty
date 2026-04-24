@@ -43,7 +43,11 @@ DIST_DIR = ROOT / "dist"
 FAMILY_MODERN = "Glass TTY VT220 Modern"
 FAMILY_OBLIQUE = "Glass TTY VT220 Oblique"
 
-VERSION = "Version 002.000"
+VERSION_MAJOR = 2
+VERSION_MINOR = 1
+VERSION = f"Version {VERSION_MAJOR:03d}.{VERSION_MINOR:03d}"
+VERSION_TAG = f"{VERSION_MAJOR}.{VERSION_MINOR:03d}"
+VERSION_REVISION = VERSION_MAJOR + VERSION_MINOR / 1000.0
 
 # Affine-shear italic: x' = x + (y - SHEAR_PIVOT_Y) * SHEAR_SLANT.
 # slant 0.1763 = tan(10°); pivot at mid-cap so the glyph stays centered
@@ -82,7 +86,7 @@ class Variant:
 
     @property
     def unique_id(self) -> str:
-        return f"{self.ps_name}:2.000"
+        return f"{self.ps_name}:{VERSION_TAG}"
 
     @property
     def full_name(self) -> str:
@@ -267,7 +271,7 @@ def _apply_variant_metadata(font: TTFont, variant: Variant) -> None:
     gasp.version = 1
     gasp.gaspRange = {0xFFFF: 0x0A}  # DOGRAY | SYMMETRIC_SMOOTHING
     os2.xAvgCharWidth = ADVANCE
-    head.fontRevision = 2.0
+    head.fontRevision = VERSION_REVISION
 
 
 # ---- affine-shear post-process ---------------------------------------------
