@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-from .pixel import draw_pixel_run
+from .pixel import REGULAR, Mode, draw_pixel_run
 
 GRID_W = 8
 GRID_H = 7
@@ -48,7 +48,7 @@ class Glyph:
         """Fetch by design row (0=baseline, 6=cap-top)."""
         return self.rows[GRID_H - 1 - design_row]
 
-    def draw(self, pen) -> None:
+    def draw(self, pen, mode: Mode = REGULAR) -> None:
         for design_row in range(GRID_H):
             row = self.grid_row(design_row)
             col = 0
@@ -59,7 +59,7 @@ class Glyph:
                 start = col
                 while col < GRID_W and row[col]:
                     col += 1
-                draw_pixel_run(pen, design_row, start, col - 1)
+                draw_pixel_run(pen, design_row, start, col - 1, mode)
 
 
 def _parse_row(line: str) -> tuple[bool, ...]:

@@ -57,12 +57,15 @@ def verify(ttf_path: Path) -> None:
             continue
         p = RecordingPen()
         gs[glyph_name].draw(p)
+        # Bold/SemiBold push pixels into the right sidebearing (up to ADVANCE=500).
+        # Italic/Oblique shear glyphs around mid-cap so both sidebearings can
+        # be consumed; allow ~100 units of overhang on each side.
         for op, args in p.value:
             for pt in args:
                 if not isinstance(pt, tuple):
                     continue
                 x, y = pt
-                if not (0 <= x <= 400 and -200 <= y <= 800):
+                if not (-100 <= x <= ADVANCE + 100 and -220 <= y <= 800):
                     errors.append(f"U+{cp:04X}: point ({x},{y}) outside glyph body")
                     break
 
