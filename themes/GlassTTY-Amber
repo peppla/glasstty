@@ -1,0 +1,31 @@
+# GlassTTY VT220 amber phosphor theme for Ghostty.
+
+background = #120900
+foreground = #d89b35
+cursor-color = #ffd47a
+cursor-text = #120900
+selection-background = #5a3510
+selection-foreground = #ffe0a0
+
+# Keep bold text in the regular font style and render it as higher intensity.
+font-style-bold = false
+font-style-bold-italic = false
+font-synthetic-style = no-bold,no-bold-italic
+bold-color = bright
+
+palette = 0=#120900
+palette = 1=#a84820
+palette = 2=#b88524
+palette = 3=#d89b35
+palette = 4=#9e6a24
+palette = 5=#c46f2b
+palette = 6=#b87824
+palette = 7=#d89b35
+palette = 8=#3a2109
+palette = 9=#e66d32
+palette = 10=#ffc35a
+palette = 11=#ffd47a
+palette = 12=#e2a549
+palette = 13=#ffae58
+palette = 14=#ffc067
+palette = 15=#ffe0a0

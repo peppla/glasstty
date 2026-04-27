@@ -1,0 +1,31 @@
+# GlassTTY VT220 green phosphor theme for Ghostty.
+
+background = #001006
+foreground = #3fd66b
+cursor-color = #9effb4
+cursor-text = #001006
+selection-background = #0b4a20
+selection-foreground = #c9ffd6
+
+# Keep bold text in the regular font style and render it as higher intensity.
+font-style-bold = false
+font-style-bold-italic = false
+font-synthetic-style = no-bold,no-bold-italic
+bold-color = bright
+
+palette = 0=#001006
+palette = 1=#1f9f4a
+palette = 2=#35c85e
+palette = 3=#52d973
+palette = 4=#249251
+palette = 5=#31b468
+palette = 6=#2abf72
+palette = 7=#3fd66b
+palette = 8=#063117
+palette = 9=#46e36d
+palette = 10=#76f58c
+palette = 11=#9effb4
+palette = 12=#5ee883
+palette = 13=#6cf0a0
+palette = 14=#84f7b4
+palette = 15=#c9ffd6
